@@ -1,7 +1,5 @@
-//auto.waitFor() // 检查是否开启无障碍模式
-//auto("fast") // 开启快速模式
 
-// 获取时间格式
+// 格式化时间
 Date.prototype.Format = function (fmt) {
     var o = {
         "M+": this.getMonth() + 1, //月份 
@@ -18,27 +16,69 @@ Date.prototype.Format = function (fmt) {
     return fmt;
 }
 
-var getTime=function(){
+// 获取当天日期
+var getToday = function () {
     let day=(new Date).Format("yyyy-MM-dd")
     return day
 }
 
+// 下载视频到相册
 var DownloadVideos=function(){
-    const day=getTime()
-    //http://tiktokbot.emarkdigital.tech/2023-01-05/us/today_hot_video_compress.mp4
-    const videoUrl="http://tiktokbot.emarkdigital.tech/"+day+"/us/today_hot_video_compress.mp4"
+    this.download=function(){
+        const day = getToday();
+        const videoUrl = "http://tiktokbot.emarkdigital.tech/" + day + "/us/today_hot_video_compress.mp4" // 拼接视频url
+        const targetFilePath = "/storage/emulated/0/Pictures/Gallery/owner/tkvideos/" + day + ".mp4" // 目标地址
+        if (files.exists(targetFilePath)){ //检测文件是否存在，存在则返回
+            return targetFilePath
+        }
+        var r = http.get(videoUrl, {
+            headers: {
+                'Accept': '*/*',
+                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.84 Safari/537.36',
+            },
+        }); //请求
+        var fileBodyBytes = r.body.bytes()
+        files.writeBytes(targetFilePath, fileBodyBytes) //写入指定路径
+        console.log("-----downloading.....")
+        media.scanFile(targetFilePath) // 扫描文件，并加入相册
+        console.log("-----file scaning.....")
+        return targetFilePath
+    }
     
 }
 
-var AppRunning=function(appName){
-    var packageName=getPackageName(appName)
+// 运行脚本
+var TikTokRunning=function(videoFilePath){
+    var packageName=getPackageName("TikTok")
     app.launch(packageName)
-    console.log("start up :",appName)
 
-    while(!click('Profile'));
-    while(!click('Upload'));
+    //while(!click('Profile'));
+    while(!click(549.0,2196.0)); // 点击上传按钮
+    while(!click('Upload')); // 点击相册
+    while(!click(165.0,556.0)); // 选择视频
+    while(!click('Next')); //执行下一步
+    while(!click(873.0,2198.0)); // 点击post
 
+    sleep(60*10) //无法监测上传状态，睡眠等待
+
+    //上传完成后，删除文件
+    if(files.exists(videoFilePath)){
+        files.remove(videoFilePath)
+        media.scanFile(videoFilePath)
+        console.log('-----removed.....')
+    }
 }
 
-//var appRunning=new AppRunning("TikTok")
-var downloadVideos=new DownloadVideos()
+function taskNameFormat(taskName){
+    var str='+++++'+taskName+'+++++'
+    return str
+}
+
+console.log(taskNameFormat("DownloadVideos start up."))
+var downloadVideos = new DownloadVideos()
+var filepath=downloadVideos.download()
+console.log(taskNameFormat("DownloadVideos done."))
+
+console.log(taskNameFormat("TikTokRunning start up."))
+var appRunning=new TikTokRunning(filepath)
+console.log(taskNameFormat("TikTokRunning done."))
