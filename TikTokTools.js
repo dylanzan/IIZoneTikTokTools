@@ -16,6 +16,22 @@ Date.prototype.Format = function (fmt) {
     return fmt;
 }
 
+// 获取随机数
+var getRandomNum = function (min, max) {
+    switch (arguments.length) {
+        case 1:
+            return parseInt(Math.random() * min + 1, 10);
+            break;
+        case 2:
+            return parseInt(Math.random() * (max - min + 1) + min, 10);
+            break;
+        default:
+            return 0;
+            break;
+    }
+}
+
+
 // 获取当天日期
 var getToday = function () {
     let day=(new Date).Format("yyyy-MM-dd")
@@ -53,11 +69,15 @@ var TikTokRunning=function(videoFilePath){
     app.launch(packageName)
 
     //while(!click('Profile'));
-    while(!click(549.0,2196.0)); // 点击上传按钮
+    // upload上传button区间 x[487,594] y[2151,2226]
+    var x = getRandomNum(487, 594);
+    var y = getRandomNum(2151, 2226);
+    console.log("upload: x: "+x+" y: "+y )
+    click(x,y); // 点击上传按钮
     while(!click('Upload')); // 点击相册
-    while(!click(165.0,556.0)); // 选择视频
+    click(165.0,556.0); // 选择视频
     while(!click('Next')); //执行下一步
-    while(!click(873.0,2198.0)); // 点击post
+    click(873.0,2198.0); // 点击post
 
     sleep(60*10) //无法监测上传状态，睡眠等待
 
