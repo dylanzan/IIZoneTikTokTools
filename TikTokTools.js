@@ -42,7 +42,7 @@ var getToday = function () {
 var DownloadVideos=function(){
     this.download=function(){
         const day = getToday();
-        const videoUrl = "http://tiktokbot.emarkdigital.tech/" + day + "/us/today_hot_video_compress.mp4" // 拼接视频url
+        const videoUrl = "http://tiktokbot.emarkdigital.tech/" + day + "/sg/today_hot_video_compress.mp4" // 拼接视频url
         const targetFilePath = "/storage/emulated/0/Pictures/Gallery/owner/tkvideos/" + day + ".mp4" // 目标地址
         if (files.exists(targetFilePath)){ //检测文件是否存在，存在则返回
             return targetFilePath
@@ -67,19 +67,25 @@ var DownloadVideos=function(){
 var TikTokRunning=function(videoFilePath){
     var packageName=getPackageName("TikTok")
     app.launch(packageName)
+    sleep(30*10*10)
+    console.log("-----开屏幕加载完毕.....")
 
     //while(!click('Profile'));
     // upload上传button区间 x[487,594] y[2151,2226]
-    var x = getRandomNum(487, 594);
-    var y = getRandomNum(2151, 2226);
+    var x = getRandomNum(500, 520);
+    var y = getRandomNum(2180, 2190);
     console.log("upload: x: "+x+" y: "+y )
     click(x,y); // 点击上传按钮
     while(!click('Upload')); // 点击相册
-    click(165.0,556.0); // 选择视频
+    sleep(30*10*10)
+    console.log("-----相机加载完毕.....")
+    click(186,550); // 选择视频
     while(!click('Next')); //执行下一步
-    click(873.0,2198.0); // 点击post
+    sleep(30*10*10)
+    console.log("-----缓冲视频完毕.....")
+    click(761,2178); // 点击post
 
-    sleep(60*10) //无法监测上传状态，睡眠等待
+    sleep(60*10*10*10) //无法监测上传状态，睡眠等待
 
     //上传完成后，删除文件
     if(files.exists(videoFilePath)){
